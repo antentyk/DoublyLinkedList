@@ -6,7 +6,6 @@
 #include <string>
 #include <algorithm>
 #include <functional>
-#include <random>
 
 #include "Node.hpp"
 #include "DoublyLinkedList.hpp"
@@ -174,6 +173,22 @@ TEST(DoublyLinkedList, reverse){
         ASSERT_EQ(it, expected--);
 }
 
+TEST(DoublyLinkedList, arrowOperator){
+    DoublyLinkedList<std::vector<int>> lst;
+
+    std::vector<int> tmp;
+    tmp.push_back(1);
+    tmp.push_back(2);
+    tmp.push_back(3);
+
+    lst.push_back(tmp);
+
+    ASSERT_EQ(lst.begin()->size(), 3);
+    ASSERT_EQ(lst.cbegin()->size(), 3);
+    ASSERT_FALSE(lst.begin()->empty());
+    ASSERT_FALSE(lst.cbegin()->empty());
+}
+
 TEST(DoublyLinkedList, constIterators){
     DoublyLinkedList<int> lst;
     lst.push_back(1);
@@ -189,8 +204,6 @@ TEST(DoublyLinkedList, constIterators){
     expected = 1;
     for(auto it = lstAlias.cbegin(); it != lstAlias.cend(); ++it)
         ASSERT_EQ(expected++, *it);
-    
-
 }
 
 TEST(DoublyLinkedList, size){
@@ -204,6 +217,138 @@ TEST(DoublyLinkedList, size){
             lst.push_back(i);
         
         ASSERT_EQ(lst.size(), i);
+    }
+}
+
+TEST(DoublyLinkedList, popFront){
+    DoublyLinkedList<int> lst;
+    lst.push_back(1);
+
+    lst.pop_front();
+    ASSERT_EQ(lst.size(), 0);
+
+    for(int i = 0; i < 10; i++)
+        lst.push_back(i);
+    
+    for(int i = 0; i < 10; i++){
+        ASSERT_EQ(lst.size(), 10 - i);
+        ASSERT_EQ(*lst.cbegin(), i);
+        ASSERT_EQ(*(--lst.cend()), 9);
+        ASSERT_EQ(*(--lst.end()), 9);
+        ASSERT_EQ(*lst.begin(), i);
+        lst.pop_front();
+    }
+    ASSERT_EQ(lst.size(), 0);
+}
+
+TEST(DoublyLinkedList, popBack){
+    DoublyLinkedList<int> lst;
+    lst.push_back(1);
+
+    lst.pop_back();
+    ASSERT_TRUE(lst.empty());
+
+    for(int i = 0; i < 10; ++i)
+        lst.push_back(i);
+    
+    for(int i = 0; i < 10; ++i){
+        ASSERT_EQ(lst.size(), (10 - i));
+        ASSERT_EQ(*lst.begin(), 0);
+        ASSERT_EQ(*lst.cbegin(), 0);
+        ASSERT_EQ(*(--lst.end()), 10 - 1 - i);
+        ASSERT_EQ(*(--lst.cend()), 10 - 1 - i);
+        lst.pop_back();
+    }
+    ASSERT_EQ(lst.size(), 0);
+}
+
+TEST(DoublyLinkedList, empty){
+    DoublyLinkedList<int> lst;
+    ASSERT_TRUE(lst.empty());
+    lst.push_back(1);
+    ASSERT_FALSE(lst.empty());
+    lst.push_front(2);
+    ASSERT_FALSE(lst.empty());
+    lst.pop_front();
+    ASSERT_FALSE(lst.empty());
+    lst.pop_front();
+    ASSERT_TRUE(lst.empty());
+}
+
+TEST(DoublyLinkedList, clear){
+    DoublyLinkedList<int> lst;
+    
+    for(int i = 0; i < 10000; ++i)
+        lst.push_back(i);
+    
+    ASSERT_EQ(lst.size(), 10000);
+    ASSERT_FALSE(lst.empty());
+
+    lst.clear();
+    ASSERT_TRUE(lst.empty());
+    ASSERT_EQ(lst.size(), 0);
+
+    lst.clear();
+    ASSERT_EQ(lst.size(), 0);
+}
+
+TEST(DoublyLinkedList, eraseSingle){
+    DoublyLinkedList<int> lst;
+
+    for(int i = 0; i < 5; ++i)
+        lst.push_back(i);
+    
+    auto pos = lst.begin();
+    ++pos; ++pos;
+    lst.erase(pos);
+
+    ASSERT_EQ(lst.size(), 4);
+
+    std::vector<int> expectedValues{0, 1, 3, 4};
+
+    int expectedIndex = 0;
+    for(auto it: lst)
+        ASSERT_EQ(it, expectedValues[expectedIndex++]);
+}
+
+TEST(DoublyLinkedList, eraseRange){
+    DoublyLinkedList<int> lst;
+
+    for(int i = 0; i < 5; ++i)
+        lst.push_back(i);
+    
+    auto first = lst.begin();
+    ++first;
+
+    auto last = lst.end();
+    --last;
+
+    lst.erase(first, last);
+
+    std::vector<int> expectedValues{0, 4};
+
+    int expectedIndex = 0;
+    for(auto it: lst)
+        ASSERT_EQ(it, expectedValues[expectedIndex++]);
+}
+
+TEST(DoublyLinkedList, removeIf){
+    DoublyLinkedList<int> lst;
+
+    for(int i = 0; i < 100; ++i)
+        lst.push_back(i);
+    
+    lst.erase(
+        std::remove_if(lst.begin(), lst.end(), [](int i){return (i % 2) == 0;}),
+        lst.end()
+    );
+
+    ASSERT_EQ(lst.size(), 50);
+
+    int expected = 1;
+    for(auto it: lst){
+        ASSERT_EQ(it, expected);
+        expected += 2;
     }
 }
 

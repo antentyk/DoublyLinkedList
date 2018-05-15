@@ -30,6 +30,10 @@ public:
         return *data->getValue();
     }
 
+    inline T* operator->() {
+        return data->getValue();
+    }
+
     BidirectionalIterator& operator++(){
         if(data->getRight() != nullptr)
             data = data->getRight();
