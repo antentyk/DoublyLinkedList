@@ -1,6 +1,9 @@
 #ifndef BIDIRECTIONAL_ITERATOR_
 #define BIDIRECTIONAL_ITERATOR_
 
+#include "DoublyLinkedList.hpp"
+#include "Node.hpp"
+
 template<class T>
 class DoublyLinkedList<T>::BidirectionalIterator{
 public:

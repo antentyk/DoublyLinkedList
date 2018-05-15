@@ -174,6 +174,39 @@ TEST(DoublyLinkedList, reverse){
         ASSERT_EQ(it, expected--);
 }
 
+TEST(DoublyLinkedList, constIterators){
+    DoublyLinkedList<int> lst;
+    lst.push_back(1);
+    lst.push_back(2);
+    lst.push_back(3);
+
+    const DoublyLinkedList<int> &lstAlias = lst;
+
+    int expected = 1;
+    for(auto it: lstAlias)
+        ASSERT_EQ(expected++, it);
+    
+    expected = 1;
+    for(auto it = lstAlias.cbegin(); it != lstAlias.cend(); ++it)
+        ASSERT_EQ(expected++, *it);
+    
+
+}
+
+TEST(DoublyLinkedList, size){
+    DoublyLinkedList<int> lst;
+    ASSERT_EQ(lst.size(), 0);
+
+    for(size_t i = 1; i <= 1000; ++i){
+        if(i % 2 == 0)
+            lst.push_front(i);
+        else
+            lst.push_back(i);
+        
+        ASSERT_EQ(lst.size(), i);
+    }
+}
+
 int main(int argc, char ** argv){
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
