@@ -6,6 +6,7 @@
 #include <string>
 #include <algorithm>
 #include <functional>
+#include <iterator>
 
 #include "Node.hpp"
 #include "DoublyLinkedList.hpp"
@@ -350,6 +351,115 @@ TEST(DoublyLinkedList, removeIf){
         ASSERT_EQ(it, expected);
         expected += 2;
     }
+}
+
+TEST(DoublyLinkedList, reversedTraversal){
+    DoublyLinkedList<int> lst;
+    lst.push_back(1);
+    lst.push_back(2);
+    lst.push_back(3);
+
+    int expected = 3;
+    for(auto it = lst.rbegin(); it != lst.rend(); ++it, --expected)
+        ASSERT_EQ(*it, expected);
+    
+    expected  = 3;
+    for(auto it = lst.crbegin(); it != lst.crend(); ++it, --expected)
+        ASSERT_EQ(*it, expected);
+    
+    const DoublyLinkedList<int> &lstAlias = lst;
+    expected = 3;
+    for(auto it = lstAlias.rbegin(); it != lstAlias.rend(); ++it, --expected)
+        ASSERT_EQ(*it, expected);
+}
+
+TEST(DoublyLinkedList, reversedIteratorsOperations){
+    DoublyLinkedList<int> lst;
+    lst.push_back(1);
+    lst.push_back(2);
+    lst.push_back(3);
+
+    lst.erase(lst.rbegin());
+
+    ASSERT_EQ(lst.size(), 2);
+    ASSERT_EQ(*lst.begin(), 1);
+    ASSERT_EQ(*(--lst.end()), 2);
+
+    {
+        auto it = ++lst.rbegin();
+        lst.insert(it, 3);
+    }
+
+    auto it = lst.begin();
+    ASSERT_EQ(*it++, 3);
+    ASSERT_EQ(*it++, 1);
+    ASSERT_EQ(*it++, 2);
+
+    lst.erase(--lst.rend());
+
+    it = lst.begin();
+    ASSERT_EQ(*it++, 1);
+    ASSERT_EQ(*it++, 2);
+
+    lst.erase(lst.rbegin(), lst.rend());
+    ASSERT_TRUE(lst.empty());
+    ASSERT_EQ(lst.size(), 0);
+}
+
+TEST(DoublyLinkedList, back_inserter){
+    DoublyLinkedList<int> lst;
+    auto it = std::back_inserter(lst);
+    it = 2;
+    ASSERT_EQ(lst.size(), 1);
+    ASSERT_EQ(*--lst.end(), 2);
+
+    lst.clear();
+
+    DoublyLinkedList<int>
+        lstFrom,
+        lstTo;
+    
+    for(int i = 1; i <= 3; ++i){
+        lstFrom.push_back(i);
+        lstTo.push_back(10 * i);
+    }
+
+    std::copy(lstFrom.begin(), lstFrom.end(), std::back_inserter(lstTo));
+
+    ASSERT_EQ(lstTo.size(), 6);
+    auto lstToIter = lstTo.rbegin();
+    
+    std::vector<int> expectedValues{10, 20, 30, 1, 2, 3};
+    for(auto expected = expectedValues.rbegin(); expected != expectedValues.rend(); ++expected)
+        ASSERT_EQ(*expected, *(lstToIter++));
+}
+
+TEST(DoublyLinkedList, front_inserter){
+    DoublyLinkedList<int> lst;
+    auto it = std::front_inserter(lst);
+    it = 2;
+    ASSERT_EQ(lst.size(), 1);
+    ASSERT_EQ(*--lst.end(), 2);
+
+    lst.clear();
+
+    DoublyLinkedList<int>
+        lstFrom,
+        lstTo;
+    
+    for(int i = 1; i <= 3; ++i){
+        lstFrom.push_front(i);
+        lstTo.push_front(10 * i);
+    }
+
+    std::copy(lstFrom.rbegin(), lstFrom.rend(), std::front_inserter(lstTo));
+
+    ASSERT_EQ(lstTo.size(), 6);
+    auto lstToIter = lstTo.rbegin();
+    
+    std::vector<int> expectedValues{3, 2, 1, 30, 20, 10};
+    for(auto expected = expectedValues.rbegin(); expected != expectedValues.rend(); ++expected)
+        ASSERT_EQ(*expected, *(lstToIter++));
 }
 
 int main(int argc, char ** argv){

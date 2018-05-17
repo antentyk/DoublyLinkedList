@@ -11,11 +11,15 @@
 template<class T>
 class DoublyLinkedList{
 public:
-    class BidirectionalIterator;
-    class ConstBidirectionalIterator;
+    template<class ValueType>
+    class Iterator;
 
-    typedef BidirectionalIterator iterator;
-    typedef ConstBidirectionalIterator const_iterator;
+    typedef T value_type;
+
+    typedef Iterator<T> iterator;
+    typedef Iterator<const T> const_iterator;
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     DoublyLinkedList(){
         head = new Node<T>(nullptr);
@@ -34,6 +38,15 @@ public:
     inline const_iterator cbegin() const { return const_iterator(head); }
     inline const_iterator cend() const { return const_iterator(tail); }
 
+    inline reverse_iterator rbegin() { return reverse_iterator(end()); }
+    inline reverse_iterator rend() { return reverse_iterator(begin()); }
+
+    inline const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+    inline const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
+
+    inline const_reverse_iterator crbegin() const { return const_reverse_iterator(cend()); }
+    inline const_reverse_iterator crend() const { return const_reverse_iterator(cbegin()); }
+
     void insert(iterator it, const T& val){
         Node<T>
             *left = it.data->getLeft(),
@@ -51,6 +64,10 @@ public:
 
         if(it == begin())
             head = current;
+    }
+
+    void insert(reverse_iterator it, const T& val){
+        return insert(--it.base(), val);
     }
 
     inline void push_back(const T& val){ insert(end(), val); }
@@ -97,6 +114,13 @@ public:
             right->setLeft(left);
     }
 
+    inline void erase(reverse_iterator it){
+        return erase(--it.base());
+    }
+    inline void erase(reverse_iterator first, reverse_iterator second){
+        return erase(second.base(), first.base());
+    }
+
     inline void pop_front(){ erase(begin()); }
     inline void pop_back(){ erase(--end()); }
     
@@ -115,7 +139,6 @@ private:
     Node<T> *head, *tail;
 };
 
-#include "BidirectionalIterator.hpp"
-#include "ConstBidirectionalIterator.hpp"
+#include "DoublyLinkedListIterator.hpp"
 
 #endif

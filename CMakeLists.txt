@@ -9,8 +9,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG")
 set(FILESLST
     Node.hpp
     DoublyLinkedList.hpp
-    BidirectionalIterator.hpp
-    ConstBidirectionalIterator.hpp
+    DoublyLinkedListIterator.hpp
 )
 
 find_package(GTest REQUIRED)
