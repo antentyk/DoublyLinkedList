@@ -27,14 +27,14 @@ public:
         Iterator(nullptr)
     {}
 
-    // Iterator(const Iterator<ValueType>&) = default;
-    // Iterator<ValueType> operator=(const Iterator<ValueType>&) = default;
+    Iterator(const Iterator<ValueType>&) = default;
+    Iterator<ValueType>& operator=(const Iterator<ValueType>&) = default;
 
     inline bool operator==(const Iterator<ValueType> &other)const noexcept{ 
         return data == other.data; 
     }
     inline bool operator!=(const Iterator<ValueType> &other)const{
-        return !operator==(other);
+        return !((*this) == other);
     }
 
     inline reference operator*(){
@@ -45,26 +45,22 @@ public:
     }
 
     Iterator<ValueType>& operator++(){
-        if(data->getRight() != nullptr)
-            data = data->getRight();
+        data = data->getRight();
         return *this;
     }
     Iterator<ValueType> operator++(int){
         Iterator<ValueType> tmp(*this);
-        if(data->getRight() != nullptr)
-            data = data->getRight();
+        ++(*this);
         return tmp;
     }
 
     Iterator<ValueType>& operator--(){
-        if(data->getLeft() != nullptr)
-            data = data->getLeft();
+        data = data->getLeft();
         return *this;
     }
     Iterator<ValueType> operator--(int){
         Iterator<ValueType> tmp(*this);
-        if(data->getLeft() != nullptr)
-            data = data->getLeft();
+        --(*this);
         return tmp;
     }
 private:
